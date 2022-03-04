@@ -1,0 +1,60 @@
+.wordle-game{
+    position: inherit;
+    height: 600px;
+}
+
+.wordle-game .wordle-board{
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    gap: 4px;
+    width: 350px;
+    height: 420px;
+    /* background-color: blue; */
+    font-family: Jost;
+    font-size: 24pt;
+    font-weight: 500;
+}
+
+.wordle-game .wordle-row{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    height: 100%;
+    gap: 4px;
+    align-items: center;
+}
+
+.wordle-game .wordle-tile{
+    border: 1px solid white;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wordle-game .tile-absent{
+    height: 100%;
+    width: 100%;
+    display: inherit;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--tile-absent);
+}
+
+.wordle-game .tile-present{
+    height: 100%;
+    width: 100%;
+    display: inherit;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--tile-present);
+}
+
+.wordle-game .tile-correct{
+    height: 100%;
+    width: 100%;
+    display: inherit;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--tile-correct);
+}

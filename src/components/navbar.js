@@ -20,7 +20,7 @@ function Navbar() {
             <FontAwesomeIcon icon={faCircleQuestion} />
           </div>
         </div>
-        <div className="content-middle">WORDLE</div>
+        <div className="content-middle">Wordle</div>
         <div className="content-right">
           <div className="navbar-button">
             <FontAwesomeIcon icon={faChartColumn} />
