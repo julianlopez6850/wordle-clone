@@ -1,9 +1,37 @@
 import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faGear,
+  faChartColumn,
+  faBars,
+  faCircleQuestion,
+} from "@fortawesome/free-solid-svg-icons";
+import "../styles/navbar.css";
 
 function Navbar() {
-  return <div className="">
-    Test
-  </div>;
+  return (
+    <div className="the-navbar">
+      <div className="navbar-content">
+        <div className="content-left">
+          <div className="navbar-button">
+            <FontAwesomeIcon icon={faBars} />
+          </div>
+          <div className="navbar-button">
+            <FontAwesomeIcon icon={faCircleQuestion} />
+          </div>
+        </div>
+        <div className="content-middle">WORDLE</div>
+        <div className="content-right">
+          <div className="navbar-button">
+            <FontAwesomeIcon icon={faChartColumn} />
+          </div>
+          <div className="navbar-button">
+            <FontAwesomeIcon icon={faGear} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default Navbar;
