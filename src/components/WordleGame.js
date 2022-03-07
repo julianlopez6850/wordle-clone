@@ -1,7 +1,18 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import "../styles/WordleGame.css";
 
 function WordleGame() {
+
+  const [userInput, setUserInput] = useState("");
+
+  const getUserInput = () => {
+    console.log(userInput);
+  }
+
+  useEffect(() => {
+    getUserInput();
+  }, [userInput]);
+
   return (
     <div className="wordle-game">
       {/* WordleGame */}
@@ -69,6 +80,10 @@ function WordleGame() {
           <div className="wordle-tile"></div>
         </div>
       </div>
+
+        <input type="text" onChange={(event) => {
+          setUserInput(event.target.value);
+        }} />
     </div>
   );
 }
