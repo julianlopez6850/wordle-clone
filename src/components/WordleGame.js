@@ -9,9 +9,10 @@ import GuessableWords from "./GuessableWords";
 let wordIndex = Math.floor(Math.random() * ((PossibleWords.length)));
 //console.log(wordIndex);
 let theWord = PossibleWords[wordIndex];
-console.log(theWord);
+//console.log(theWord);
 
 let guesses = 0;
+let isGameOver = false;
 
 function WordleGame() {
 
@@ -27,7 +28,12 @@ function WordleGame() {
   }
 
   const checkGuessValidity = () => {  // check whether the guess is valid (5 letters? an actual word?).
-    
+
+    if(isGameOver)
+    {
+      return;
+    }
+
     if(userInput.length !== 5) // make sure the guess is 5 letters
     {
       console.log("Error. Input is " + userInput.length + " character(s). It should be 5.");
@@ -50,8 +56,6 @@ function WordleGame() {
       guesses++;
       checkGuessCorrectness();
     }
-
-    
   }
 
   const checkGuessCorrectness = () => {   // check the guess against the real word.
@@ -145,25 +149,29 @@ function WordleGame() {
         //*/
     }
 
-    for(let i = 0; i < 5; i++)      // if any letter is not green, break. Else (all letters are green), congratulate the player for winning
+    for(let i = 0; i < 5; i++)      // if any letter is not green, break. Else (all letters are green), congratulate the player for winning and set isGameOver flag to true.
     {
         if(letters[i] !== "green")
             break;
-        else if(i === 4 && guesses === 1)
-        {
-          console.log("Congratulations! The word was " + theWord + ". You got it in " + guesses + " guess!");
-          return;
-        }
         else if(i === 4)
         {
+          isGameOver = true;
+
+          if(guesses === 1)
+          {
+            console.log("Congratulations! The word was " + theWord + ". You got it in " + guesses + " guess!");
+            return;
+          }
+          
           console.log("Congratulations! The word was " + theWord + ". You got it in " + guesses + " guesses!");
           return;
         }
     }
     
-    if(guesses === 6)                // if this point is reached and guesses equals 6, the user lost.
+    if(guesses === 6)                // if this point is reached and guesses equals 6, tell the user they lost and set the isGameOver flag to true.
     {
         console.log("You lost. The word was " + theWord);
+        isGameOver = true;
         return;
     }
 
