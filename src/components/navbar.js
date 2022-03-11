@@ -6,7 +6,7 @@ import {
   faBars,
   faCircleQuestion,
 } from "@fortawesome/free-solid-svg-icons";
-import "../styles/navbar.css";
+import "../styles/Navbar.css";
 
 function Navbar() {
   return (

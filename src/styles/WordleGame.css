@@ -58,3 +58,9 @@
     justify-content: center;
     background-color: var(--tile-correct);
 }
+
+.wordle-game .wordle-text-box input[type=text]{
+    margin: 16px 0px;
+    width: 100%;
+    height: 50px;
+}

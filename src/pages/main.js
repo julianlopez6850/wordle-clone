@@ -1,6 +1,6 @@
 import React from "react";
 import WordleGame from "../components/WordleGame";
-import '../styles/main.css';
+import '../styles/Main.css';
 
 function Main() {
   return <div className="main-page">
