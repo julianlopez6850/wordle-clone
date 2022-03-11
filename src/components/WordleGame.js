@@ -26,11 +26,6 @@ function WordleGame() {
 
   const [userInput, setUserInput] = useState("");
 
-  const getUserInput = () => {
-    //console.log(userInput);
-    //console.log(guesses);
-  }
-
   const checkGuessValidity = () => {  // check whether the guess is valid (5 letters? an actual word?).
 
     if(isGameOver)
@@ -71,8 +66,8 @@ function WordleGame() {
     let theWordLetters = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     let theGuessLetters = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-    // initialize each letter as a grey letter, to be changed to yellow or green in upcoming logic
-    let letters = ["grey", "grey", "grey", "grey", "grey"];
+    // initialize each letter as a grey letter (tile-absent), to be changed to yellow (tile-present) or green (tile-correct) in upcoming logic
+    let letters = ["tile-absent", "tile-absent", "tile-absent", "tile-absent", "tile-absent"];
     
     for(let i = 0; i < 5; i++)  // fill in the arrays for counting the letters in theWord and theGuess
     {
@@ -103,7 +98,7 @@ function WordleGame() {
     {
       if(theGuess.charAt(i) === theWord.charAt(i)) // If that letter exists in the actual word and is in the correct position, set the letter to green 
       {
-        letters[i] = "green";
+        letters[i] = "tile-correct";
         theWordLetters[theWord.charCodeAt(i) - 'a'.charCodeAt(0)]--;
       }
 
@@ -125,13 +120,13 @@ function WordleGame() {
 
     for(let i = 0; i < 5; i++)      // For each letter in the guess...
     {
-        if(letters[i] !== ("green"))     // If the letter isn't green...
+        if(letters[i] !== ("tile-correct"))     // If the letter isn't green...
         {
             for(let j = 0; j < 5; j++)  // If the letter meets the conditions to be yellow, set the letter to yellow.
             {
               if(theGuess.charAt(i) === theWord.charAt(j) && theWordLetters[theWord.charCodeAt(j) - 'a'.charCodeAt(0)] !== 0)
               {
-                  letters[i] = "yellow";
+                  letters[i] = "tile-present";
                   theWordLetters[theWord.charCodeAt(j) - 'a'.charCodeAt(0)]--;
                   break;
               }
@@ -157,7 +152,7 @@ function WordleGame() {
 
     for(let i = 0; i < 5; i++)      // if any letter is not green, break. Else (all letters are green), congratulate the player for winning and set isGameOver flag to true.
     {
-        if(letters[i] !== "green")
+        if(letters[i] !== "tile-correct")
             break;
         else if(i === 4)
         {
@@ -189,46 +184,42 @@ function WordleGame() {
 
   }
 
-  useEffect(() => {
-    getUserInput();
-  }, [userInput]);
-
   return (
     <div className="wordle-game">
       {/* WordleGame */}
       <div className="wordle-board">
         <div className="wordle-row">
           <div className="wordle-tile">
-            <div className={colorsList[0][0] === "grey" ? "tile-absent" : colorsList[0][0] === "yellow" ? "tile-present" : colorsList[0][0] === "green" ? "tile-correct" : ""}>{guesses === 0 ? userInput.charAt(0) : guessList[0].charAt(0)}</div>
+            <div className={colorsList[0][0]}>{guesses === 0 ? userInput.charAt(0) : guessList[0].charAt(0)}</div>
           </div>
           <div className="wordle-tile">
-            <div className={colorsList[0][1] === "grey" ? "tile-absent" : colorsList[0][1] === "yellow" ? "tile-present" : colorsList[0][1] === "green" ? "tile-correct" : ""}>{guesses === 0 ? userInput.charAt(1) : guessList[0].charAt(1)}</div>
+            <div className={colorsList[0][1]}>{guesses === 0 ? userInput.charAt(1) : guessList[0].charAt(1)}</div>
           </div>
           <div className="wordle-tile">
-            <div className={colorsList[0][2] === "grey" ? "tile-absent" : colorsList[0][2] === "yellow" ? "tile-present" : colorsList[0][2] === "green" ? "tile-correct" : ""}>{guesses === 0 ? userInput.charAt(2) : guessList[0].charAt(2)}</div>
+            <div className={colorsList[0][2]}>{guesses === 0 ? userInput.charAt(2) : guessList[0].charAt(2)}</div>
           </div>
           <div className="wordle-tile">
-            <div className={colorsList[0][3] === "grey" ? "tile-absent" : colorsList[0][3] === "yellow" ? "tile-present" : colorsList[0][3] === "green" ? "tile-correct" : ""}>{guesses === 0 ? userInput.charAt(3) : guessList[0].charAt(3)}</div>
+            <div className={colorsList[0][3]}>{guesses === 0 ? userInput.charAt(3) : guessList[0].charAt(3)}</div>
           </div>
           <div className="wordle-tile">
-            <div className={colorsList[0][4] === "grey" ? "tile-absent" : colorsList[0][4] === "yellow" ? "tile-present" : colorsList[0][4] === "green" ? "tile-correct" : ""}>{guesses === 0 ? userInput.charAt(4) : guessList[0].charAt(4)}</div>
+            <div className={colorsList[0][4]}>{guesses === 0 ? userInput.charAt(4) : guessList[0].charAt(4)}</div>
           </div>
         </div>
         <div className="wordle-row">
           <div className="wordle-tile">
-            <div className={colorsList[1][0] === "grey" ? "tile-absent" : colorsList[1][0] === "yellow" ? "tile-present" : colorsList[1][0] === "green" ? "tile-correct" : ""}>{guesses === 1 ? userInput.charAt(0) : guessList[1].charAt(0)}</div>
+            <div className={colorsList[1][0]}>{guesses === 1 ? userInput.charAt(0) : guessList[1].charAt(0)}</div>
           </div>
           <div className="wordle-tile">
-            <div className={colorsList[1][1] === "grey" ? "tile-absent" : colorsList[1][1] === "yellow" ? "tile-present" : colorsList[1][1] === "green" ? "tile-correct" : ""}>{guesses === 1 ? userInput.charAt(1) : guessList[1].charAt(1)}</div>
+            <div className={colorsList[1][1]}>{guesses === 1 ? userInput.charAt(1) : guessList[1].charAt(1)}</div>
           </div>
           <div className="wordle-tile">
-            <div className={colorsList[1][2] === "grey" ? "tile-absent" : colorsList[1][2] === "yellow" ? "tile-present" : colorsList[1][2] === "green" ? "tile-correct" : ""}>{guesses === 1 ? userInput.charAt(2) : guessList[1].charAt(2)}</div>
+            <div className={colorsList[1][2]}>{guesses === 1 ? userInput.charAt(2) : guessList[1].charAt(2)}</div>
           </div>
           <div className="wordle-tile">
-            <div className={colorsList[1][3] === "grey" ? "tile-absent" : colorsList[1][3] === "yellow" ? "tile-present" : colorsList[1][3] === "green" ? "tile-correct" : ""}>{guesses === 1 ? userInput.charAt(3) : guessList[1].charAt(3)}</div>
+            <div className={colorsList[1][3]}>{guesses === 1 ? userInput.charAt(3) : guessList[1].charAt(3)}</div>
           </div>
           <div className="wordle-tile">
-            <div className={colorsList[1][4] === "grey" ? "tile-absent" : colorsList[1][4] === "yellow" ? "tile-present" : colorsList[1][4] === "green" ? "tile-correct" : ""}>{guesses === 1 ? userInput.charAt(4) : guessList[1].charAt(4)}</div>
+            <div className={colorsList[1][4]}>{guesses === 1 ? userInput.charAt(4) : guessList[1].charAt(4)}</div>
           </div>
         </div>
         <div className="wordle-row">
