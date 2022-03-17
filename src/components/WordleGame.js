@@ -47,8 +47,8 @@ function WordleGame() {
     {
       console.log("Error. Input is " + userInput.length + " character(s). It should be 5.");
     }
-    else if (!GuessableWords.includes(userInput)) // make sure the guess is in the list of guessable words
-    {      
+    else if (!(GuessableWords.includes(userInput) || PossibleWords.includes(userInput))) // make sure the guess is in the list of guessable words
+    {
       console.log("Error. The word " + userInput + " is not in our word list.");
     }
     else // if both of the above conditions are met, the guess is valid. Do the following:
@@ -138,6 +138,8 @@ function WordleGame() {
 
   // reset game.
   const resetGame = () => {
+
+    console.log("GAME RESET. The word was " + theWord + ".\n")
     
     // come up with a new word from the list of possible words
     wordIndex = Math.floor(Math.random() * PossibleWords.length);
@@ -159,7 +161,7 @@ function WordleGame() {
     isGameOver = false;
     setUserInput(" ");
 
-    console.log("GAME RESET\n")
+    
   }
 
   useEffect(() => {
