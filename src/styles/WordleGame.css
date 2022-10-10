@@ -1,6 +1,8 @@
 .wordle-game{
-    position: inherit;
-    height: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: fit-content;
 }
 
 .wordle-game .wordle-board{
@@ -59,8 +61,56 @@
     background-color: var(--tile-correct);
 }
 
-.wordle-game .wordle-text-box input[type=text]{
+.wordle-game .wordle-text-box{
     margin: 16px 0px;
     width: 100%;
     height: 50px;
+}
+
+.wordle-game .keyboard{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    grid-template-rows: repeat(3, 1fr);
+    margin-top: 20px;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+    /* background-color: blue; */
+    font-family: Jost;
+    font-size: 18pt;
+    font-weight: 500;
+}
+
+.wordle-game .keyboard-row{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 4px;
+    align-items: center;
+}
+
+.wordle-game .keyboard-button button{
+    border-radius: 5px;
+    border: none;
+    background-color: var(--keyboard-tile-original);
+    padding: 10px 5px 10px 5px;
+    height: 100%;
+    min-width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wordle-game .letter-correct button{
+    background-color: var(--tile-correct);
+}
+
+.wordle-game .letter-present button{
+    background-color: var(--tile-present);
+}
+
+.wordle-game .letter-absent button{
+    background-color: var(--tile-absent);
 }
