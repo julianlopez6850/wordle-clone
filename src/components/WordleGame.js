@@ -57,6 +57,8 @@ function WordleGame() {
 
   const [userInput, setUserInput] = useState("");   // holds the user's input until the user presses enter
 
+  const [dummy, setDummy] = useState(0) // a useState hook used solely to force rerenders when needed.
+
   // check whether the guess is valid (5 letters? an actual word?).
   const checkGuessValidity = () => {
 
@@ -81,17 +83,12 @@ function WordleGame() {
   };
 
   useEffect(() => {
-    console.log("num guesses: " + guesses)
-    console.log("theGuess: " + theGuess)
     var arr = guessList
     arr[guesses - 1] = theGuess
     setGuessList(arr);    // save guess into guessList
     checkGuessCorrectness();          // call the checkGuessCorrectness function
+    setDummy(dummy + 1)
   }, [guesses]);
-
-  useEffect(() => {
-    console.log("HELLO")
-  }, [JSON.stringify(guessList)])
 
   // check the guess against the real word.
   const checkGuessCorrectness = () => {
@@ -129,29 +126,29 @@ function WordleGame() {
             letters[i] = "tile-present";
             theWordLetters[theWord.charCodeAt(j) - "a".charCodeAt(0)]--;
             if (usedLetters[theGuess.charCodeAt(i) - "a".charCodeAt(0)] !== "letter-correct") {
-              var arr = usedLetters
-              arr[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-present"
-              setUsedLetters(arr);
+              setUsedLetters(usedLetters => {
+                var arr = usedLetters;
+                arr[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-present"
+                return arr
+              })
             }
             break;
           }
           else if (usedLetters[theGuess.charCodeAt(i) - "a".charCodeAt(0)] === "") {
-            var arr = usedLetters
-            arr[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-absent"
-            setUsedLetters(arr);
+            setUsedLetters(usedLetters => {
+              var arr = usedLetters;
+              arr[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-absent"
+              return arr
+            })
           }
         }
       }
-
-      //console.log("\t" + theGuess.charAt(i) + ": " + letters[i]);
-      //console.log(usedLetters.toString());
     }
-
-    //presenceList[guesses - 1] = letters;
-
-    var arr = presenceList;
-    arr[guesses - 1] = letters
-    setPresenceList(arr)
+    setPresenceList(presenceList => {
+      var arr = presenceList;
+      arr[guesses - 1] = letters
+      return arr
+    })
 
     for (let i = 0; i < 5; i++)  // if any letter is not green, break. Else (all letters are green), congratulate the player for winning and set isGameOver flag to true.
     {
@@ -228,9 +225,9 @@ function WordleGame() {
     return usedLetters[key.charCodeAt(0) - "a".charCodeAt(0)];
   }
 
-  const handleButtonDisplay = () => {
+  const handleEnterButton = () => {
     return (
-      <button onClick={() => (checkGuessValidity())}>
+      <button onClick={() => checkGuessValidity()}>
         <div className={"enter"}>{"ENTER"}</div>
       </button>
     )
@@ -255,7 +252,6 @@ function WordleGame() {
               present, or in the correct position of the correct word.
               
               */
-              { console.log(userInput) }
               return <WordleTile
                 letter={guesses === rowNum ? userInput.charAt(tileNum).toUpperCase() : guessList[rowNum].charAt(tileNum).toUpperCase()}
                 presence={tile}
@@ -276,7 +272,7 @@ function WordleGame() {
       else if (e.key.length === 1)
         updateUserInput(e.key.toLowerCase());
     };
-    handleButtonDisplay();
+    handleEnterButton();
     handleWordleBoard()
     document.addEventListener('keydown', keyPressed, true);
     return () => document.removeEventListener('keydown', keyPressed, true);
@@ -294,7 +290,7 @@ function WordleGame() {
           <div className="keyboard-row">
             {keyButtons[rowNum].map((key) => (
               <div className={"keyboard-button " + updateKeyButtons(key)}>
-                {(key === "ENTER") ? handleButtonDisplay() :
+                {(key === "ENTER") ? handleEnterButton() :
                   <button onClick={() => (updateUserInput(key))}>
                     <div className={key}>{key.toUpperCase()}</div>
                   </button>}
