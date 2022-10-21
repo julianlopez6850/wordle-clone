@@ -8,6 +8,7 @@ import GuessableWords from "./GuessableWords";    // list of words that can be g
 // finding a random index to pick a word from the list of possible words
 let wordIndex = Math.floor(Math.random() * PossibleWords.length);
 let theWord = PossibleWords[wordIndex];
+theWord = "apply"
 
 let keyButtons = [
   ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
@@ -110,9 +111,11 @@ function WordleGame() {
       if (theGuess.charAt(i) === theWord.charAt(i)) {
         letters[i] = "tile-correct";
         theWordLetters[theWord.charCodeAt(i) - "a".charCodeAt(0)]--;
-        var arr = usedLetters
-        arr[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-correct"
-        setUsedLetters(arr);
+        setUsedLetters(usedLetters => {
+          var arr = usedLetters;
+          arr[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-correct"
+          return arr
+        })
       }
     }
 
