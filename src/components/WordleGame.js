@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import WordleTile from "./WordleTile";
 import "../styles/WordleGame.css";
 
 import PossibleWords from "./PossibleWords";      // list of words that can be the actual word
 import GuessableWords from "./GuessableWords";    // list of words that can be guessed
 
+import { ToastPortal } from "./Toasts/ToastPortal.js" // Toast Portal is used to create a portal to render toast notifications on top of WordleGame
+
 // finding a random index to pick a word from the list of possible words
 let wordIndex = Math.floor(Math.random() * PossibleWords.length);
 let theWord = PossibleWords[wordIndex];
 
+// holds the rows of keys to be displayed on the on-screen keyboard
 let keyButtons = [
   ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
   ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
@@ -18,12 +21,12 @@ let keyButtons = [
 let isGameOver = false; // flag to check if the game is over (the player guesses the correct word OR the player lost on guesses)
 
 function WordleGame() {
-  const [guesses, setGuesses] = useState(0);  // holds the number of valid guesses made by the user
+  const toastRef = useRef();  // holds a ref for toasts
+  const [autoClose, setAutoClose] = useState(false);  // holds whether or not the created toast should auto close
 
   const [theGuess, setTheGuess] = useState("");  // holds valid guesses made by the user to check for correctness
-
-  // guessList array holds the valid guesses that are made by the user
-  const [guessList, setGuessList] = useState(["", "", "", "", "", ""]);
+  const [guessList, setGuessList] = useState(["", "", "", "", "", ""]);  // guessList array holds the valid guesses that are made by the user
+  const [numGuesses, setNumGuesses] = useState(0);  // holds the number of valid guesses made by the user
 
   // this event listener will stop an enter press from re-firing a previously clicked button.
   window.addEventListener('keydown', function (e) {
@@ -52,46 +55,50 @@ function WordleGame() {
     "letter-present" = the word is present, but in the wrong spot 
     "letter-absent" = the word is absent from the word entirely
   */
-  //a   b   c   d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z
+  //                                              a   b   c   d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z
   const [usedLetters, setUsedLetters] = useState(["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]);
 
-  const [userInput, setUserInput] = useState("");   // holds the user's input until the user presses enter
+  const [userInput, setUserInput] = useState(""); // holds the user's input until the user presses enter
 
   const [dummy, setDummy] = useState(0) // a useState hook used solely to force rerenders when needed.
 
   // check whether the guess is valid (5 letters? an actual word?).
   const checkGuessValidity = () => {
-
     if (isGameOver) // if isGameOver is true, do not allow another guess to be made
-    {
       return;
-    }
+    setAutoClose(true);
     if (userInput.length !== 5) // make sure the guess is 5 letters
     {
-      console.log("Error. Input is " + userInput.length + " character(s). It should be 5.");
+      console.log("Error. Not enough letters.");
+      addToast("info", ("Not enough letters"));
     }
     else if (!(GuessableWords.includes(userInput) || PossibleWords.includes(userInput))) // make sure the guess is in the list of guessable words
     {
       console.log("Error. The word " + userInput + " is not in our word list.");
+      addToast("info", ("That is not in our word list."));
     }
     else // if both of the above conditions are met, the guess is valid. Do the following:
     {
       setTheGuess(userInput);           // initialize theGuess as userInput
-      setGuesses(guesses + 1);          // increment guesses counter
+      setNumGuesses(numGuesses => numGuesses + 1);          // increment guesses counter
       setUserInput("");                 // empty userInput
     }
   };
 
+  // this useEffect will update useState variables after a user makes a valid guess
   useEffect(() => {
-    var arr = guessList
-    arr[guesses - 1] = theGuess
-    setGuessList(arr);    // save guess into guessList
+    // save guess into guessList
+    setGuessList(guessList => {
+      guessList[numGuesses - 1] = theGuess;
+      return guessList;
+    });
     checkGuessCorrectness();          // call the checkGuessCorrectness function
     setDummy(dummy + 1)
-  }, [guesses]);
+  }, [numGuesses]);
 
   // check the guess against the real word.
   const checkGuessCorrectness = () => {
+    setAutoClose(false);
 
     // arrays to fill in the number of times each letter appears in theWord and theGuess later on
     let theWordLetters = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -110,9 +117,10 @@ function WordleGame() {
       if (theGuess.charAt(i) === theWord.charAt(i)) {
         letters[i] = "tile-correct";
         theWordLetters[theWord.charCodeAt(i) - "a".charCodeAt(0)]--;
-        var arr = usedLetters
-        arr[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-correct"
-        setUsedLetters(arr);
+        setUsedLetters(usedLetters => {
+          usedLetters[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-correct";
+          return usedLetters;
+        });
       }
     }
 
@@ -127,27 +135,24 @@ function WordleGame() {
             theWordLetters[theWord.charCodeAt(j) - "a".charCodeAt(0)]--;
             if (usedLetters[theGuess.charCodeAt(i) - "a".charCodeAt(0)] !== "letter-correct") {
               setUsedLetters(usedLetters => {
-                var arr = usedLetters;
-                arr[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-present"
-                return arr
+                usedLetters[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-present";
+                return usedLetters;
               })
             }
             break;
           }
           else if (usedLetters[theGuess.charCodeAt(i) - "a".charCodeAt(0)] === "") {
             setUsedLetters(usedLetters => {
-              var arr = usedLetters;
-              arr[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-absent"
-              return arr
+              usedLetters[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-absent";
+              return usedLetters;
             })
           }
         }
       }
     }
     setPresenceList(presenceList => {
-      var arr = presenceList;
-      arr[guesses - 1] = letters
-      return arr
+      presenceList[numGuesses - 1] = letters;
+      return presenceList;
     })
 
     for (let i = 0; i < 5; i++)  // if any letter is not green, break. Else (all letters are green), congratulate the player for winning and set isGameOver flag to true.
@@ -157,19 +162,17 @@ function WordleGame() {
       else if (i === 4) {
         isGameOver = true;
 
-        if (guesses === 1) {
-          console.log("Congratulations! The word was " + theWord + ". You got it in " + guesses + " guess!");
-          return;
-        }
-
-        console.log("Congratulations! The word was " + theWord + ". You got it in " + guesses + " guesses!");
+        var victoryGuesses = (numGuesses === 1) ? " guess!" : " guesses!"
+        console.log("Congratulations! The word was " + theWord + ". You got it in " + numGuesses + victoryGuesses);
+        addToast("win", ("Congratulations! The word was " + theWord + ". You got it in " + numGuesses + victoryGuesses));
         return;
       }
     }
 
     // if this point is reached and guesses equals 6, tell the user they lost and set the isGameOver flag to true.
-    if (guesses === 6) {
+    if (numGuesses === 6) {
       console.log("You lost. The word was " + theWord);
+      addToast("lose", ("You lost. The word was " + theWord));
       isGameOver = true;
       return;
     }
@@ -185,7 +188,7 @@ function WordleGame() {
     theWord = PossibleWords[wordIndex];
 
     // reset all of the game variables to their original states
-    setGuesses(0);
+    setNumGuesses(0);
     setTheGuess("");
     setGuessList(["", "", "", "", "", ""]);
     setPresenceList([
@@ -199,101 +202,93 @@ function WordleGame() {
     isGameOver = false;
     setUserInput("");
     setUsedLetters(["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]);
+
+    // remove all toasts
+    toastRef.current.removeToasts();
   }
 
+  // this function will create a toast notification when called
+  const addToast = (mode, message, autoClose) => {
+    toastRef.current.addMessage({ mode, message, autoClose});
+  }
+
+  // this function will update the user input when called
   const updateUserInput = (key) => {
-    if (key.charAt(0) === "<") {
-      let newInput = "";
-      for (let i = 0; i < userInput.length; i++) {
-        if (i !== userInput.length - 1)
-          newInput += userInput.charAt(i);
-      }
+    if(!isGameOver)
+    {
+      if (key.charAt(0) === "<") {
+        let newInput = "";
+        for (let i = 0; i < userInput.length; i++) {
+          if (i !== userInput.length - 1)
+            newInput += userInput.charAt(i);
+        }
 
-      setUserInput(newInput);
+        setUserInput(newInput);
+      }
+      else if (userInput.length < 5 && key.charAt(0) >= "a" && key.charAt(0) <= "z")
+        setUserInput(userInput + key)
     }
-    else if (userInput.length < 5 && ((key.charAt(0) >= "a" && key.charAt(0) <= "z") || (key.charAt(0) >= "A" && key.charAt(0) <= "Z")))
-      setUserInput(userInput + key)
   }
 
+  // this function will update the color of the on-screen keyboard buttons after each guess
   const updateKeyButtons = (key) => {
-    useEffect(() => {
-      var arr = usedLetters
-      arr[key - "a".charCodeAt(0)] = usedLetters[key - "a".charCodeAt(0)];
-      setUsedLetters(arr);
-    }, []);
-
     return usedLetters[key.charCodeAt(0) - "a".charCodeAt(0)];
   }
 
-  const handleEnterButton = () => {
-    return (
-      <button onClick={() => checkGuessValidity()}>
-        <div className={"enter"}>{"ENTER"}</div>
-      </button>
-    )
-  }
-
-  const handleWordleBoard = () => {
-    return (
-      <div className="wordle-board">
-        {/* Each row of presenceList is rendered... */}
-        {presenceList.map((guess, rowNum) => (
-          <div className="wordle-row">
-            {/* Each tile of a row in presenceList is rendered... */}
-            {presenceList[rowNum].map((tile, tileNum) => {
-              /*
-              
-              Determines the letter to render by comparing the amount of guesses to the current row.
-              
-              If the row you are on represents the number of guesses then it will be populated with tiles as you type,
-              If not, then the row will be populated with tiles that were submitted to the guessList.
-              
-              The presence of a tile is determined from its entry in presenceList, such as if the letter t is absent,
-              present, or in the correct position of the correct word.
-              
-              */
-              return <WordleTile
-                letter={guesses === rowNum ? userInput.charAt(tileNum).toUpperCase() : guessList[rowNum].charAt(tileNum).toUpperCase()}
-                presence={tile}
-              />
-            })}
-          </div>
-        ))}
-      </div>
-    )
-  }
-
+  // this useEffect captures keyboard inputs and handles them as necessary
   useEffect(() => {
     const keyPressed = (e) => {
-      if (e.key.toLowerCase() === "enter")
+      if (e.key === "Enter")
         checkGuessValidity();
-      else if (e.key.toLowerCase() === "backspace")
+      else if (e.key === "Backspace")
         updateUserInput("<");
       else if (e.key.length === 1)
         updateUserInput(e.key.toLowerCase());
     };
-    handleEnterButton();
-    handleWordleBoard()
     document.addEventListener('keydown', keyPressed, true);
     return () => document.removeEventListener('keydown', keyPressed, true);
   }, [userInput]);
 
   return (
     <div className="wordle-game">
-      {/* WordleGame */}
-      {handleWordleBoard()}
+
+      {/* Wordle game board */}
+      <div className="wordle-board">
+        {/* Each row of presenceList is rendered... */}
+        {presenceList.map((guess, rowNum) => (
+          <div className="wordle-row">
+            {/* Each tile in each row of presenceList is rendered... */}
+            {presenceList[rowNum].map((tile, tileNum) => {
+              /*
+              Determines the letter to render by comparing the amount of guesses to the current row.
+              If the row number equals the number of guesses entered, then it will be populated with tiles as userInput is updated.
+              Ottherwise, the row will be populated with tiles that were previously submitted to the guessList.
+              The presence of a tile is determined from its entry in presenceList, such as if the letter t is absent, present, or in the correct position of the correct word.
+              */
+              return <WordleTile
+                letter={numGuesses === rowNum ? userInput.charAt(tileNum).toUpperCase() : guessList[rowNum].charAt(tileNum).toUpperCase()}
+                presence={tile}
+              />
+            })}
+          </div>
+        ))}
+      </div>
 
       {/* Keyboard buttons */}
       <div className="keyboard">
-        {/* Each row of presenceList is rendered... */}
+        {/* Each row of keyButtons is rendered... */}
         {keyButtons.map((row, rowNum) => (
           <div className="keyboard-row">
+          {/* Each tile in each row of keyButtons is rendered... */}
             {keyButtons[rowNum].map((key) => (
+              /*
+              Render the on-screen keyboard buttons. Each button is rendered with updateKeyButtons in its className to control its color.
+              If the key pressed is the ENTER key, then call checkGuessValidity(), otherwise call updateUserInput().
+              */
               <div className={"keyboard-button " + updateKeyButtons(key)}>
-                {(key === "ENTER") ? handleEnterButton() :
-                  <button onClick={() => (updateUserInput(key))}>
-                    <div className={key}>{key.toUpperCase()}</div>
-                  </button>}
+                <button onClick={() => ((key === "ENTER") ? checkGuessValidity() : updateUserInput(key))}>
+                  <div className={key}>{key.toUpperCase()}</div>
+                </button>
               </div>
             ))}
           </div>
@@ -305,7 +300,8 @@ function WordleGame() {
         <input type="submit" value="Reset" onClick={resetGame} />
       </div>
 
-
+      {/* Toast notifications */}
+      <ToastPortal ref={toastRef} autoClose={autoClose} />
     </div>
   );
 }
