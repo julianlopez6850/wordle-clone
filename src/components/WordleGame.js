@@ -141,12 +141,6 @@ function WordleGame() {
             }
             break;
           }
-          else if (usedLetters[theGuess.charCodeAt(i) - "a".charCodeAt(0)] === "") {
-            setUsedLetters(usedLetters => {
-              usedLetters[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-absent";
-              return usedLetters;
-            })
-          }
         }
       }
     }
@@ -177,6 +171,20 @@ function WordleGame() {
       return;
     }
   };
+
+  // this useEffect handles coloring the on-screen keyboard buttons grey if the letter is absent.
+  useEffect(() => {
+    for (let i = 0; i < 5; i++) // For each letter in the guess...
+    {
+      if (usedLetters[theGuess.charCodeAt(i) - "a".charCodeAt(0)] === "") {
+        setUsedLetters(usedLetters => {
+          usedLetters[theGuess.charCodeAt(i) - "a".charCodeAt(0)] = "letter-absent";
+          return usedLetters;
+        })
+      }
+    }
+    setDummy(dummy + 1);
+  }, [userInput]);
 
   // reset game.
   const resetGame = () => {
